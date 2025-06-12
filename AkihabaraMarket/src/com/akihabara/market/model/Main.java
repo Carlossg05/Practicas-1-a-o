@@ -1,42 +1,82 @@
+// Main.java (Controlador)
 package com.akihabara.market.model;
 
-/**
- * Esta clase contiene el método principal que ejecuta el programa.
- * Crea dos productos otaku y muestra su información por pantalla.
- */
+import com.akihabara.market.dao.ProductoDAO;
+import com.akihabara.market.model.ProductoOtaku;
+import com.akihabara.market.view.InterfazConsola;
+import java.util.List;
+
 public class Main {
-
-    /**
-     * Método principal que se ejecuta al iniciar el programa.
-     * Aquí se crean dos objetos de tipo ProductoOtaku y se muestran sus datos.
-     */
     public static void main(String[] args) {
+        InterfazConsola vista = new InterfazConsola();
+        ProductoDAO productoDAO = new ProductoDAO(); // Asumiendo que ProductoDAO ya está implementado y configura la conexión a BD
 
-        // Crear un producto usando el constructor con todos los datos
-        com.akihabara.market.model.ProductoOtaku producto1 = new com.akihabara.market.model.ProductoOtaku(
-            "Figura de Son Goku Super Saiyajin", // Nombre
-            "Figuras de Acción",                  // Categoría
-            35.99,                                // Precio
-            50,                                   // Stock
-            "Figura detallada de Son Goku de Dragon Ball Z." // Descripción
-        );
-
-        // Mostrar información del primer producto
-        System.out.println("Producto 1:");
-        System.out.println(producto1.toString());
-
-        System.out.println("\n---------------------------------------------------------------\n");
-
-        // Crear un producto vacío y luego asignar los datos uno por uno
-        com.akihabara.market.model.ProductoOtaku producto2 = new com.akihabara.market.model.ProductoOtaku();
-        producto2.setNombre("Manga Attack on Titan Vol. 1");
-        producto2.setCategoria("Manga");
-        producto2.setPrecio(9.99);
-        producto2.setStock(120);
-        producto2.setDescripcion("Primer volumen de la aclamada serie de manga Attack on Titan.");
-
-        // Mostrar información del segundo producto
-        System.out.println("Producto 2:");
-        System.out.println(producto2.toString());
+        int opcion;
+        do {
+            opcion = vista.mostrarMenuPrincipal();
+            switch (opcion) {
+                case 1: // Añadir producto
+                    vista.mostrarMensaje("Has elegido Añadir producto.");
+                    ProductoOtaku nuevoProducto = vista.pedirDatosNuevoProducto();
+                    if (productoDAO.insertarProducto(nuevoProducto)) {
+                        vista.mostrarMensajeExito("Producto añadido con éxito.");
+                    } else {
+                        vista.mostrarMensajeError("Error al añadir el producto.");
+                    }
+                    break;
+                case 2: // Consultar producto por ID
+                    vista.mostrarMensaje("Has elegido Consultar producto por ID.");
+                    int idConsulta = vista.pedirIdProducto();
+                    ProductoOtaku productoEncontrado = productoDAO.obtenerProductoPorId(idConsulta);
+                    vista.mostrarProducto(productoEncontrado);
+                    break;
+                case 3: // Listar todos los productos
+                    vista.mostrarMensaje("Has elegido Listar todos los productos.");
+                    List<ProductoOtaku> todosLosProductos = productoDAO.obtenerTodosLosProductos();
+                    vista.mostrarListaProductos(todosLosProductos);
+                    break;
+                case 4: // Listar productos por nombre
+                    vista.mostrarMensaje("Has elegido Listar productos por nombre.");
+                    String nombreConsulta = vista.pedirNombreProducto();
+                    List<ProductoOtaku> productosPorNombre = productoDAO.obtenerProductosPorNombre(nombreConsulta);
+                    vista.mostrarListaProductos(productosPorNombre);
+                    break;
+                case 5: // Listar productos por categoría
+                    vista.mostrarMensaje("Has elegido Listar productos por categoría.");
+                    String categoriaConsulta = vista.pedirCategoriaProducto();
+                    List<ProductoOtaku> productosPorCategoria = productoDAO.obtenerProductosPorCategoria(categoriaConsulta);
+                    vista.mostrarListaProductos(productosPorCategoria);
+                    break;
+                case 6: // Actualizar producto
+                    vista.mostrarMensaje("Has elegido Actualizar producto.");
+                    int idActualizar = vista.pedirIdProducto();
+                    ProductoOtaku productoParaActualizar = productoDAO.obtenerProductoPorId(idActualizar);
+                    if (productoParaActualizar != null) {
+                        ProductoOtaku datosActualizados = vista.pedirDatosActualizacionProducto(productoParaActualizar);
+                        if (productoDAO.actualizarProducto(datosActualizados)) {
+                            vista.mostrarMensajeExito("Producto actualizado con éxito.");
+                        } else {
+                            vista.mostrarMensajeError("Error al actualizar el producto.");
+                        }
+                    } else {
+                        vista.mostrarMensajeError("No se encontró ningún producto con el ID: " + idActualizar);
+                    }
+                    break;
+                case 7: // Eliminar producto
+                    vista.mostrarMensaje("Has elegido Eliminar producto.");
+                    int idEliminar = vista.pedirIdProducto();
+                    if (productoDAO.eliminarProducto(idEliminar)) {
+                        vista.mostrarMensajeExito("Producto eliminado con éxito.");
+                    } else {
+                        vista.mostrarMensajeError("Error al eliminar el producto o el producto no existe.");
+                    }
+                    break;
+                case 8: // Salir del programa
+                    vista.mostrarMensaje("Saliendo del programa. ¡Hasta pronto!");
+                    break;
+                default:
+                    vista.mostrarMensajeError("Opción no válida. Por favor, intenta de nuevo.");
+            }
+        } while (opcion != 8);
     }
 }

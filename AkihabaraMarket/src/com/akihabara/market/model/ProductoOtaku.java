@@ -1,5 +1,7 @@
 package com.akihabara.market.model;
 
+import java.math.BigDecimal;
+
 /**
  * Esta clase representa un producto otaku, como figuras, mangas o ropa.
  * Guarda información como el nombre, la categoría, el precio, el stock y una descripción del producto.
@@ -46,7 +48,11 @@ public class ProductoOtaku {
 
     // Métodos para obtener y cambiar los valores de los atributos
 
-    public String getNombre() {
+    public ProductoOtaku(int i, String nombre2, String categoria2, double precio2, int stock2) {
+		// TODO Auto-generated constructor stub
+	}
+
+	public String getNombre() {
         return nombre;
     }
 
@@ -93,4 +99,9 @@ public class ProductoOtaku {
     public String toString() {
         return "ProductoOtaku " + "nombre = " + nombre + ", precio = " + precio + ", descripcion = " + descripcion;
     }
+
+	public String getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
